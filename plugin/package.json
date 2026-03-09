@@ -1,6 +1,6 @@
 {
   "name": "dcs-f4e-streamdeck",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Stream Deck + plugin for DCS World F-4E Phantom II via DCS-ExportScripts",
   "main": "com.dcs.f4e.sdPlugin/bin/plugin.js",
   "scripts": {
