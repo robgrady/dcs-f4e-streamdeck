@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>F-4E Gauge Readout</title>
+  <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+  <style>
+    .section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #969696;
+      margin: 16px 20px 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+    .sdpi-wrapper { padding: 0; }
+    .gauge-hint {
+      font-size: 11px;
+      color: #777;
+      padding: 4px 20px 8px;
+      line-height: 1.4;
+    }
+    .custom-fields { display: none; }
+    .custom-fields.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="sdpi-wrapper">
+
+    <sdpi-item label="Gauge">
+      <select class="sdpi-item-value" id="preset" onchange="onPresetChange()">
+        <option value="">-- Custom --</option>
+
+        <optgroup label="Flight Instruments">
+          <option value="airspeed">Airspeed (KTS)</option>
+          <option value="mach">Mach Number</option>
+          <option value="altitude">Altitude (FT)</option>
+          <option value="vvi">Vertical Speed (FPM)</option>
+          <option value="aoa">Angle of Attack (°)</option>
+          <option value="heading">Heading (°)</option>
+          <option value="radar_alt">Radar Altitude (FT)</option>
+          <option value="g_force">G-Force</option>
+        </optgroup>
+
+        <optgroup label="Engine">
+          <option value="rpm_l">RPM Left (%)</option>
+          <option value="rpm_r">RPM Right (%)</option>
+          <option value="egt_l">EGT Left (°C)</option>
+          <option value="egt_r">EGT Right (°C)</option>
+          <option value="nozzle_l">Nozzle Left (%)</option>
+          <option value="nozzle_r">Nozzle Right (%)</option>
+          <option value="oil_press_l">Oil Pressure Left (PSI)</option>
+          <option value="oil_press_r">Oil Pressure Right (PSI)</option>
+        </optgroup>
+
+        <optgroup label="Fuel">
+          <option value="fuel_qty">Fuel Quantity (LBS)</option>
+          <option value="fuel_flow_l">Fuel Flow Left (PPH)</option>
+          <option value="fuel_flow_r">Fuel Flow Right (PPH)</option>
+        </optgroup>
+
+        <optgroup label="Systems">
+          <option value="hyd_pc1">Hydraulic PC1 (PSI)</option>
+          <option value="hyd_pc2">Hydraulic PC2 (PSI)</option>
+          <option value="hyd_utility">Hydraulic Utility (PSI)</option>
+        </optgroup>
+      </select>
+    </sdpi-item>
+
+    <div class="gauge-hint" id="gaugeHint">
+      Select a gauge to display live cockpit instrument data on the touch strip.
+    </div>
+
+    <div class="custom-fields" id="customFields">
+      <div class="section-title">Custom Gauge</div>
+
+      <sdpi-item label="Arg ID">
+        <input class="sdpi-item-value" type="number" id="customArgId" placeholder="Draw argument ID" />
+      </sdpi-item>
+
+      <sdpi-item label="Label">
+        <input class="sdpi-item-value" type="text" id="customLabel" placeholder="e.g., FUEL QTY" />
+      </sdpi-item>
+
+      <sdpi-item label="Unit">
+        <input class="sdpi-item-value" type="text" id="customUnit" placeholder="e.g., LBS" />
+      </sdpi-item>
+
+      <sdpi-item label="Min Value">
+        <input class="sdpi-item-value" type="number" id="customMin" placeholder="0" step="any" />
+      </sdpi-item>
+
+      <sdpi-item label="Max Value">
+        <input class="sdpi-item-value" type="number" id="customMax" placeholder="100" step="any" />
+      </sdpi-item>
+    </div>
+
+  </div>
+
+  <script>
+    let websocket = null;
+    let uuid = null;
+    let currentSettings = {};
+
+    const GAUGE_HINTS = {
+      airspeed:     "Indicated airspeed in knots. Range: 0–850 KTS.",
+      mach:         "Mach number from the airspeed indicator. Range: 0–2.5 M.",
+      altitude:     "Barometric altitude from the altimeter drums. Range: 0–80,000 FT.",
+      vvi:          "Vertical velocity. Positive = climbing, negative = descending. Range: ±6,000 FPM.",
+      aoa:          "Angle of attack. Warns above 20°. Range: 0–30°.",
+      heading:      "Magnetic heading from the HSI compass card. 0–360°.",
+      radar_alt:    "Radar altimeter (AGL). Warns below 200 FT. Range: 0–5,000 FT.",
+      g_force:      "Current G-load from the accelerometer. Warns above 7G or below -1G.",
+      rpm_l:        "Left engine RPM percentage. Warns above 103%.",
+      rpm_r:        "Right engine RPM percentage. Warns above 103%.",
+      egt_l:        "Left engine exhaust gas temperature. Warns above 650°C.",
+      egt_r:        "Right engine exhaust gas temperature. Warns above 650°C.",
+      nozzle_l:     "Left engine nozzle position (0% closed – 100% open).",
+      nozzle_r:     "Right engine nozzle position (0% closed – 100% open).",
+      oil_press_l:  "Left engine oil pressure. Warns below 25 PSI.",
+      oil_press_r:  "Right engine oil pressure. Warns below 25 PSI.",
+      fuel_qty:     "Internal fuel quantity. Warns below 2,500 LBS.",
+      fuel_flow_l:  "Left engine fuel flow in pounds per hour.",
+      fuel_flow_r:  "Right engine fuel flow in pounds per hour.",
+      hyd_pc1:      "Hydraulic system PC1 pressure. Warns below 1,000 PSI.",
+      hyd_pc2:      "Hydraulic system PC2 pressure. Warns below 1,000 PSI.",
+      hyd_utility:  "Hydraulic utility system pressure. Warns below 1,000 PSI.",
+    };
+
+    function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+      uuid = inUUID;
+      const actionInfo = JSON.parse(inActionInfo);
+      currentSettings = actionInfo.payload.settings || {};
+
+      websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+      websocket.onopen = function() {
+        websocket.send(JSON.stringify({ event: inRegisterEvent, uuid: inUUID }));
+        loadSettings();
+      };
+      websocket.onmessage = function(evt) {
+        const data = JSON.parse(evt.data);
+        if (data.event === "didReceiveSettings") {
+          currentSettings = data.payload.settings || {};
+          loadSettings();
+        }
+      };
+    }
+
+    function loadSettings() {
+      const fields = ["preset", "customArgId", "customLabel", "customUnit", "customMin", "customMax"];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && currentSettings[id] !== undefined) el.value = currentSettings[id];
+      });
+      updateUI();
+    }
+
+    function onPresetChange() {
+      saveSettings();
+      updateUI();
+    }
+
+    function updateUI() {
+      const preset = document.getElementById("preset").value;
+      const customFields = document.getElementById("customFields");
+      const hint = document.getElementById("gaugeHint");
+
+      if (preset === "") {
+        customFields.classList.add("visible");
+        hint.textContent = "Enter a DCS draw argument ID and display settings for a custom gauge.";
+      } else {
+        customFields.classList.remove("visible");
+        hint.textContent = GAUGE_HINTS[preset] || "Live cockpit instrument readout.";
+      }
+    }
+
+    function saveSettings() {
+      const settings = {};
+      const fields = {
+        preset: "string",
+        customArgId: "int",
+        customLabel: "string",
+        customUnit: "string",
+        customMin: "float",
+        customMax: "float",
+      };
+      for (const [key, type] of Object.entries(fields)) {
+        const val = document.getElementById(key)?.value;
+        if (val === "" || val === undefined) continue;
+        if (type === "int") settings[key] = parseInt(val);
+        else if (type === "float") settings[key] = parseFloat(val);
+        else settings[key] = val;
+      }
+      if (websocket) {
+        websocket.send(JSON.stringify({ event: "setSettings", context: uuid, payload: settings }));
+      }
+    }
+
+    document.addEventListener("change", saveSettings);
+    document.addEventListener("input", function(e) {
+      if (e.target.tagName === "INPUT") {
+        clearTimeout(e.target._debounce);
+        e.target._debounce = setTimeout(saveSettings, 300);
+      }
+    });
+  </script>
+</body>
+</html>

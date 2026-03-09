@@ -9,6 +9,7 @@ in real-time on your Stream Deck buttons.
 - **120+ cockpit controls** mapped with verified device/command IDs
 - **Rotary encoder support** for radio tuning, radar controls, volume knobs
 - **Real-time state feedback** - buttons reflect actual cockpit switch positions
+- **Live gauge readouts** on the touch strip — airspeed, altitude, RPM, fuel, G-force, and more
 - **UHF radio frequency display** on the Stream Deck + touch strip
 - **Connection status indicator** - see when DCS is connected
 - **Preset system** - pick controls from a dropdown, no need to look up IDs
@@ -133,6 +134,7 @@ This creates a `.streamDeckPlugin` file that can be double-clicked to install on
    - **F-4E Multi-Position** — for multi-position selector knobs (LCD keys)
    - **F-4E Dial** — for rotary controls (encoder dials only)
    - **F-4E Radio Freq** — for UHF radio tuning (encoder dials only)
+   - **F-4E Gauge** — live instrument readouts (encoder touch strip only)
    - **F-4E Connection** — connection status indicator (LCD key)
 4. Select a preset from the dropdown or enter custom IDs in Advanced mode
 
@@ -144,9 +146,13 @@ This creates a `.streamDeckPlugin` file that can be double-clicked to install on
 | Arm    |        |        | Select | Mode   | Caution| Disp   |        |
 +--------+--------+--------+--------+--------+--------+--------+--------+
 
-  [UHF Radio]    [TACAN Ch]    [Radar Gain]   [HUD Bright]
-   Dial 1          Dial 2        Dial 3         Dial 4
+  [UHF Radio]    [AIRSPEED]    [ALTITUDE]     [FUEL QTY]
+   Dial 1        452 KTS ██    12500 FT ██    8430 LBS ██
 ```
+
+The touch strip between the dials can display live cockpit gauge readouts.
+The plugin ships with 3 pre-built profiles (Default, Weapons, Startup) that
+include gauge readouts for the most useful instruments.
 
 ## Action Types
 
@@ -172,6 +178,57 @@ Specialized radio frequency tuning.
 - **Push**: cycles between digit selection (100s, 10s, 1s, .1s, .01s)
 - **Touch strip**: displays current frequency (e.g., "251.000")
 - **Touch tap**: cycles through preset channels
+
+### F-4E Gauge (Encoders)
+Live cockpit instrument readout on the touch strip. Display-only — no dial interaction.
+- **Touch strip**: shows label, value with units, and a color-coded bar indicator
+- **22 presets** across 4 categories:
+  - **Flight**: Airspeed, Mach, Altitude, Vertical Speed, AOA, Heading, Radar Alt, G-Force
+  - **Engine**: RPM L/R, EGT L/R, Nozzle L/R, Oil Pressure L/R
+  - **Fuel**: Fuel Quantity, Fuel Flow L/R
+  - **Systems**: Hydraulic PC1/PC2/Utility
+- **Warning thresholds**: value text turns red when limits are exceeded
+  (e.g., RPM > 103%, EGT > 650°C, Fuel < 2500 lbs, G > 7)
+- **Custom mode**: enter any draw argument ID with your own label, unit, and range
+
+## Updating the Plugin
+
+When a new version is released, follow these steps to update your installation.
+
+### From GitHub (building from source)
+
+```cmd
+:: 1. Pull the latest code
+cd dcs-f4e-streamdeck
+git pull
+
+:: 2. Rebuild the plugin
+cd plugin
+npm install
+npm run build
+
+:: 3. Copy the updated plugin (overwrites old version)
+xcopy /E /I /Y com.dcs.f4e.sdPlugin "%APPDATA%\Elgato\StreamDeck\Plugins\com.dcs.f4e.sdPlugin"
+
+:: 4. Update the Lua export module (if changed)
+copy /Y ..\lua\F-4E-45MC.lua "%USERPROFILE%\Saved Games\DCS\Scripts\DCS-ExportScript\ExportsModules\F-4E-45MC.lua"
+
+:: 5. Restart Stream Deck software
+```
+
+Or just run `install.bat` again — it handles everything automatically.
+
+### From a .streamDeckPlugin package
+
+If someone shares an updated `.streamDeckPlugin` file, just double-click it.
+The Stream Deck software will replace the previous version automatically.
+
+### What gets preserved
+
+- **Your custom button layouts** — Stream Deck saves your button configurations
+  separately from the plugin files, so updating won't erase your layout
+- **DCS-ExportScripts Config.lua** — your UDP port settings are not overwritten
+- **Profiles** — bundled profiles are re-installed but your custom profiles are kept
 
 ## Development
 
@@ -219,11 +276,13 @@ dcs-f4e-streamdeck/
         dcs-switch-action.ts       #   Multi-position switches
         dcs-encoder-action.ts      #   Rotary encoders
         dcs-radio-action.ts        #   UHF radio tuning
+        dcs-gauge-action.ts        #   Touch strip gauge readouts
         dcs-status-action.ts       #   Connection status
       f4e/                         # F-4E control definitions
         devices.ts                 #   Device ID enum
         controls.ts                #   120+ control mappings
         presets.ts                 #   UI preset definitions
+        gauge-presets.ts           #   Gauge conversion formulas
     com.dcs.f4e.sdPlugin/          # Plugin package (distributable)
       manifest.json                #   Plugin manifest
       package.json                 #   Runtime dependencies

@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.dcs.f4e",
   "Name": "DCS F-4E Phantom II",
-  "Version": "0.2.0.0",
+  "Version": "0.3.0.0",
   "Description": "Control the DCS World F-4E Phantom II cockpit from your Stream Deck +. Supports buttons, switches, and rotary encoders with real-time cockpit state feedback.",
   "Author": "DCS F-4E Stream Deck Project",
   "Category": "DCS World",
@@ -97,6 +97,21 @@
         }
       },
       "PropertyInspectorPath": "ui/encoder-pi.html"
+    },
+    {
+      "UUID": "com.dcs.f4e.gauge",
+      "Name": "F-4E Gauge",
+      "Icon": "assets/actions/gauge",
+      "Tooltip": "Live cockpit instrument readout on the touch strip. Shows airspeed, altitude, RPM, fuel, and more with real-time updates from DCS.",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "assets/layouts/gauge-readout-layout.json",
+        "TriggerDescription": {
+          "Rotate": "—",
+          "Touch": "—"
+        }
+      },
+      "PropertyInspectorPath": "ui/gauge-pi.html"
     },
     {
       "UUID": "com.dcs.f4e.status",

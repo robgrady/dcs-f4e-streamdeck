@@ -18,6 +18,7 @@ import { DcsSwitchAction } from "./actions/dcs-switch-action.js";
 import { DcsEncoderAction } from "./actions/dcs-encoder-action.js";
 import { DcsRadioAction } from "./actions/dcs-radio-action.js";
 import { DcsStatusAction } from "./actions/dcs-status-action.js";
+import { DcsGaugeAction } from "./actions/dcs-gauge-action.js";
 
 // ---------------------------------------------------------------------------
 // Initialize DCS communication
@@ -69,6 +70,9 @@ streamDeck.actions.registerAction(
 );
 streamDeck.actions.registerAction(
   new DcsStatusAction(udpClient, stateStore),
+);
+streamDeck.actions.registerAction(
+  new DcsGaugeAction(stateStore),
 );
 
 // ---------------------------------------------------------------------------

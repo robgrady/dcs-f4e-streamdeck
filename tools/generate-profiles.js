@@ -159,6 +159,19 @@ function encoderAction(preset, title, iconName) {
   };
 }
 
+/** Build a gauge readout action (for Encoder controller) */
+function gaugeAction(preset, title) {
+  return {
+    ActionID: ACTION_ID,
+    LinkedTitle: true,
+    Name: "F-4E Gauge",
+    Settings: { preset },
+    State: 0,
+    States: [makeState(title, "bottom")],
+    UUID: "com.dcs.f4e.gauge",
+  };
+}
+
 /** Build a radio encoder action (for Encoder controller) */
 function radioAction(title, iconName) {
   return {
@@ -191,9 +204,9 @@ const PROFILES = [
     ],
     encoders: [
       radioAction("UHF RADIO", "uhf-radio"),
-      encoderAction("plt_tacan_tens", "TACAN", "tacan"),
-      encoderAction("wso_radar_gain_fine", "RADAR\nGAIN", "radar-gain"),
-      encoderAction("plt_hud_brightness", "HUD\nBRIGHT", "hud-brightness"),
+      gaugeAction("airspeed", "AIRSPEED"),
+      gaugeAction("altitude", "ALTITUDE"),
+      gaugeAction("fuel_qty", "FUEL QTY"),
     ],
   },
   {
@@ -228,10 +241,10 @@ const PROFILES = [
       statusAction(),
     ],
     encoders: [
-      radioAction("UHF RADIO", "uhf-radio"),
-      encoderAction("plt_uhf_volume", "UHF VOL", "uhf-volume"),
-      encoderAction("plt_tacan_tens", "TACAN\n10s", "tacan-10s"),
-      encoderAction("plt_tacan_ones", "TACAN\n1s", "tacan-1s"),
+      gaugeAction("rpm_l", "RPM LEFT"),
+      gaugeAction("rpm_r", "RPM RIGHT"),
+      gaugeAction("egt_l", "EGT LEFT"),
+      gaugeAction("egt_r", "EGT RIGHT"),
     ],
   },
 ];

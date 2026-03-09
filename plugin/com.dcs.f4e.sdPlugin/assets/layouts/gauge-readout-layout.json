@@ -1,0 +1,49 @@
+{
+  "id": "com.dcs.f4e.gauge-readout",
+  "items": [
+    {
+      "key": "label",
+      "type": "text",
+      "rect": [0, 0, 200, 24],
+      "font": {
+        "size": 13,
+        "weight": 600
+      },
+      "alignment": "center",
+      "color": "#AAAAAA",
+      "value": "GAUGE"
+    },
+    {
+      "key": "value",
+      "type": "text",
+      "rect": [0, 22, 150, 48],
+      "font": {
+        "size": 28,
+        "weight": 700
+      },
+      "alignment": "right",
+      "color": "#00FF00",
+      "value": "---"
+    },
+    {
+      "key": "unit",
+      "type": "text",
+      "rect": [152, 34, 48, 28],
+      "font": {
+        "size": 14,
+        "weight": 400
+      },
+      "alignment": "left",
+      "color": "#888888",
+      "value": ""
+    },
+    {
+      "key": "indicator",
+      "type": "bar",
+      "rect": [10, 78, 180, 12],
+      "value": 0,
+      "bar_fill_c": "#00CCFF",
+      "bar_bg_c": "#333333"
+    }
+  ]
+}
