@@ -1,5 +1,5 @@
 -- F-4E Phantom II Export Module for DCS-ExportScripts
--- Version: 0.3.1
+-- Version: 0.3.2
 -- Module name matches DCS internal identifier: F-4E-45MC
 --
 -- Install to:

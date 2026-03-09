@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.dcs.f4e",
   "Name": "DCS F-4E Phantom II",
-  "Version": "0.3.1.0",
+  "Version": "0.3.2.0",
   "Description": "Control the DCS World F-4E Phantom II cockpit from your Stream Deck +. Supports buttons, switches, and rotary encoders with real-time cockpit state feedback.",
   "Author": "DCS F-4E Stream Deck Project",
   "Category": "DCS World",
@@ -70,6 +70,12 @@
       "Icon": "assets/actions/encoder",
       "Tooltip": "Rotary control with touch strip feedback. Use the dial to turn knobs and the touch strip to see current value.",
       "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "assets/actions/encoder",
+          "Name": "Default"
+        }
+      ],
       "Encoder": {
         "layout": "$A1",
         "TriggerDescription": {
@@ -87,8 +93,14 @@
       "Icon": "assets/actions/radio",
       "Tooltip": "Tune UHF radio frequency with the dial. Displays current frequency on the touch strip.",
       "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "assets/actions/radio",
+          "Name": "Default"
+        }
+      ],
       "Encoder": {
-        "layout": "layouts/radio-freq-layout.json",
+        "layout": "assets/layouts/radio-freq-layout.json",
         "TriggerDescription": {
           "Push": "Toggle",
           "Rotate": "Tune",
@@ -104,6 +116,12 @@
       "Icon": "assets/actions/gauge",
       "Tooltip": "Live cockpit instrument readout on the touch strip. Shows airspeed, altitude, RPM, fuel, and more with real-time updates from DCS.",
       "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "assets/actions/gauge",
+          "Name": "Default"
+        }
+      ],
       "Encoder": {
         "layout": "assets/layouts/gauge-readout-layout.json",
         "TriggerDescription": {
