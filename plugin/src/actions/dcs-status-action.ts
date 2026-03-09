@@ -3,6 +3,7 @@
  *
  * Shows whether DCS is running and the plugin is receiving data.
  * Green (state 1) = connected, Red (state 0) = disconnected.
+ * Always displays the plugin version number.
  */
 
 import {
@@ -14,6 +15,7 @@ import {
 } from "@elgato/streamdeck";
 import type { UdpClient } from "../dcs/udp-client.js";
 import type { StateStore } from "../dcs/state-store.js";
+import { PLUGIN_VERSION } from "../version.js";
 
 @action({ UUID: "com.dcs.f4e.status" })
 export class DcsStatusAction extends SingletonAction {
@@ -35,14 +37,14 @@ export class DcsStatusAction extends SingletonAction {
 
       const aircraft = this.stateStore.get(2999) ?? "---";
       actionRef
-        .setTitle(connected ? aircraft : "OFFLINE")
+        .setTitle(connected ? `${aircraft}\nv${PLUGIN_VERSION}` : `OFFLINE\nv${PLUGIN_VERSION}`)
         .catch(() => {});
     }, 2000);
 
     this.intervals.set(ev.action.id, interval);
 
     actionRef.setState(0).catch(() => {});
-    actionRef.setTitle("OFFLINE").catch(() => {});
+    actionRef.setTitle(`OFFLINE\nv${PLUGIN_VERSION}`).catch(() => {});
   }
 
   override async onWillDisappear(ev: WillDisappearEvent): Promise<void> {
@@ -56,7 +58,11 @@ export class DcsStatusAction extends SingletonAction {
     const connected = this.udpClient.connected;
     const aircraft = this.stateStore.get(2999) ?? "---";
     actionRef
-      .setTitle(connected ? `Connected\n${aircraft}` : "Disconnected\nNo Data")
+      .setTitle(
+        connected
+          ? `Connected\n${aircraft}\nv${PLUGIN_VERSION}`
+          : `Disconnected\nNo Data\nv${PLUGIN_VERSION}`,
+      )
       .catch(() => {});
   }
 }

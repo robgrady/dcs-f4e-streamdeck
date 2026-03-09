@@ -7,6 +7,7 @@
  *   - plugin/package.json
  *   - plugin/com.dcs.f4e.sdPlugin/package.json
  *   - plugin/com.dcs.f4e.sdPlugin/manifest.json
+ *   - plugin/src/version.ts (compiled into plugin bundle)
  *   - lua/F-4E-45MC.lua (header comment)
  *
  * Usage:
@@ -78,7 +79,15 @@ manifest = manifest.replace(/"Version":\s*"[\d.]+"/, `"Version": "${manifestVers
 fs.writeFileSync(manifestPath, manifest);
 console.log(`  Updated manifest.json (${manifestVersion})`);
 
-// 5. Lua module header
+// 5. plugin/src/version.ts (baked into compiled bundle)
+const versionTsPath = path.join(ROOT, "plugin", "src", "version.ts");
+fs.writeFileSync(
+  versionTsPath,
+  `/** Plugin version — updated automatically by tools/bump-version.js */\nexport const PLUGIN_VERSION = "${newVersion}";\n`
+);
+console.log(`  Updated plugin/src/version.ts`);
+
+// 6. Lua module header
 const luaPath = path.join(ROOT, "lua", "F-4E-45MC.lua");
 if (fs.existsSync(luaPath)) {
   let lua = fs.readFileSync(luaPath, "utf-8");

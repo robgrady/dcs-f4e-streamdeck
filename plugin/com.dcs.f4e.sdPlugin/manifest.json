@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.dcs.f4e",
   "Name": "DCS F-4E Phantom II",
-  "Version": "0.3.0.0",
+  "Version": "0.3.1.0",
   "Description": "Control the DCS World F-4E Phantom II cockpit from your Stream Deck +. Supports buttons, switches, and rotary encoders with real-time cockpit state feedback.",
   "Author": "DCS F-4E Stream Deck Project",
   "Category": "DCS World",

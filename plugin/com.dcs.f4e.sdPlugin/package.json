@@ -1,6 +1,6 @@
 {
   "name": "com.dcs.f4e",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "DCS F-4E Phantom II Stream Deck Plugin",
   "main": "bin/plugin.js",
   "type": "module",
