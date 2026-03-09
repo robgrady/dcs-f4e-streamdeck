@@ -1,0 +1,35 @@
+{
+  "name": "dcs-f4e-streamdeck",
+  "version": "0.1.0",
+  "description": "Stream Deck + plugin for DCS World F-4E Phantom II via DCS-ExportScripts",
+  "main": "com.dcs.f4e.sdPlugin/bin/plugin.js",
+  "scripts": {
+    "build": "rollup -c && cd com.dcs.f4e.sdPlugin && npm install --omit=dev",
+    "build:code": "rollup -c",
+    "watch": "rollup -c -w",
+    "dev": "npm run build && npx streamdeck restart com.dcs.f4e",
+    "link": "npx streamdeck link com.dcs.f4e.sdPlugin",
+    "pack": "npm run build && npx streamdeck pack com.dcs.f4e.sdPlugin",
+    "test-harness": "npx tsx ../tools/udp-test-harness.ts",
+    "version:patch": "node ../tools/bump-version.js patch",
+    "version:minor": "node ../tools/bump-version.js minor",
+    "version:major": "node ../tools/bump-version.js major"
+  },
+  "dependencies": {
+    "@elgato/streamdeck": "^1.2.0"
+  },
+  "devDependencies": {
+    "@elgato/cli": "^1.4.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-typescript": "^12.1.0",
+    "@types/node": "^22.0.0",
+    "rollup": "^4.24.0",
+    "tslib": "^2.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

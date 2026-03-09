@@ -1,0 +1,10 @@
+{
+  "name": "com.dcs.f4e",
+  "version": "0.1.0",
+  "description": "DCS F-4E Phantom II Stream Deck Plugin",
+  "main": "bin/plugin.js",
+  "type": "module",
+  "dependencies": {
+    "@elgato/streamdeck": "^1.2.0"
+  }
+}

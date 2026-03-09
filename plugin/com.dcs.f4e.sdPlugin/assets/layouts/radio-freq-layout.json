@@ -1,0 +1,37 @@
+{
+  "id": "com.dcs.f4e.radio-freq",
+  "items": [
+    {
+      "key": "freq-label",
+      "type": "text",
+      "rect": [0, 0, 200, 30],
+      "font": {
+        "size": 13,
+        "weight": 600
+      },
+      "alignment": "center",
+      "color": "#AAAAAA",
+      "value": "UHF"
+    },
+    {
+      "key": "freq-value",
+      "type": "text",
+      "rect": [0, 28, 200, 45],
+      "font": {
+        "size": 26,
+        "weight": 700
+      },
+      "alignment": "center",
+      "color": "#00FF00",
+      "value": "----.---"
+    },
+    {
+      "key": "indicator",
+      "type": "bar",
+      "rect": [10, 80, 180, 10],
+      "value": 0,
+      "bar_fill_c": "#FF6600",
+      "bar_bg_c": "#333333"
+    }
+  ]
+}

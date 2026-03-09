@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>F-4E Button</title>
+  <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+  <style>
+    .section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #969696;
+      margin: 16px 20px 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+    .sdpi-wrapper { padding: 0; }
+    .mode-hint {
+      font-size: 10px;
+      color: #808080;
+      margin: 2px 20px 8px 20px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="sdpi-wrapper">
+
+    <sdpi-item label="Preset">
+      <select class="sdpi-item-value" id="preset" onchange="saveSettings()">
+        <option value="">-- Custom --</option>
+
+        <optgroup label="Weapons">
+          <option value="plt_master_arm">Master Arm</option>
+          <option value="plt_gun_arm">Gun Arm</option>
+          <option value="plt_station_lo">Left Outboard Arm</option>
+          <option value="plt_station_li">Left Inboard Arm</option>
+          <option value="plt_station_center">Center Arm</option>
+          <option value="plt_station_ri">Right Inboard Arm</option>
+          <option value="plt_station_ro">Right Outboard Arm</option>
+          <option value="plt_gun_rate">Gun Rate (HIGH/LOW)</option>
+          <option value="plt_interlock">Interlock</option>
+          <option value="plt_ground_safety">Ground Safety Override</option>
+          <option value="plt_jettison_push">Jettison Button</option>
+          <option value="plt_stores_emergency">Emergency Stores Release</option>
+          <option value="plt_labs_pullup_test">LABS Pull-Up Test</option>
+        </optgroup>
+
+        <optgroup label="Flight">
+          <option value="plt_gear">Landing Gear</option>
+          <option value="plt_gear_emergency">Emergency Gear Ext</option>
+          <option value="plt_anti_skid">Anti-Skid</option>
+          <option value="plt_emergency_brake">Emergency Brake</option>
+          <option value="plt_speed_brake">Speed Brake</option>
+          <option value="plt_drag_chute">Drag Chute Deploy</option>
+          <option value="plt_drag_chute_release">Drag Chute Release</option>
+          <option value="plt_arresting_hook">Arresting Hook</option>
+        </optgroup>
+
+        <optgroup label="Autopilot">
+          <option value="plt_stab_yaw">Stab Aug Yaw</option>
+          <option value="plt_stab_roll">Stab Aug Roll</option>
+          <option value="plt_stab_pitch">Stab Aug Pitch</option>
+          <option value="plt_autopilot">Autopilot</option>
+          <option value="plt_alt_hold">Altitude Hold</option>
+        </optgroup>
+
+        <optgroup label="Engine">
+          <option value="plt_engine_start">Engine Start</option>
+          <option value="plt_engine_master_l">Engine Master L</option>
+          <option value="plt_engine_master_r">Engine Master R</option>
+          <option value="plt_fire_test">Fire Test</option>
+        </optgroup>
+
+        <optgroup label="Electrical">
+          <option value="plt_generator_l">Generator L</option>
+          <option value="plt_generator_r">Generator R</option>
+          <option value="wso_battery_bypass">Battery Bypass (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Countermeasures">
+          <option value="plt_cm_flare_mode">Flare Mode</option>
+          <option value="wso_cm_dispense">CM Dispense (WSO)</option>
+          <option value="wso_cm_ripple">CM Ripple (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Radio">
+          <option value="plt_uhf_squelch">UHF Squelch</option>
+          <option value="wso_uhf_squelch">UHF Squelch (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Navigation">
+          <option value="plt_tacan_xy">TACAN X/Y</option>
+          <option value="plt_tacan_test">TACAN Test</option>
+          <option value="plt_flight_director">Flight Director</option>
+          <option value="wso_tacan_xy">TACAN X/Y (WSO)</option>
+          <option value="wso_tacan_test">TACAN Test (WSO)</option>
+        </optgroup>
+
+        <optgroup label="HUD">
+          <option value="plt_hud_shutter">HUD Shutter</option>
+        </optgroup>
+
+        <optgroup label="Fuel">
+          <option value="plt_fuel_wing_internal">Wing Internal Feed</option>
+          <option value="plt_fuel_air_refuel">Air Refuel</option>
+          <option value="plt_fuel_dump">Fuel Dump</option>
+        </optgroup>
+
+        <optgroup label="Warnings">
+          <option value="plt_master_caution">Master Caution Reset</option>
+          <option value="plt_warn_test">Warning Light Test</option>
+          <option value="wso_warn_test">Warning Light Test (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Cockpit">
+          <option value="plt_canopy">Canopy</option>
+          <option value="plt_canopy_manual_unlock">Canopy Manual Unlock</option>
+          <option value="wso_canopy">Canopy (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Radar (WSO)">
+          <option value="wso_radar_scan">Radar Scan</option>
+          <option value="wso_radar_antenna_stab">Radar Ant Stab</option>
+          <option value="wso_radar_maneuver">Radar Maneuver</option>
+        </optgroup>
+      </select>
+    </sdpi-item>
+
+    <sdpi-item label="Mode">
+      <select class="sdpi-item-value" id="mode" onchange="saveSettings(); updateModeHint()">
+        <option value="toggle">Toggle (click to switch on/off)</option>
+        <option value="momentary">Momentary (active while held)</option>
+      </select>
+    </sdpi-item>
+
+    <div class="mode-hint" id="modeHint">
+      <strong>Toggle:</strong> Each click flips the cockpit switch.
+      Button icon shows actual cockpit state (on/off).
+      Use for: Master Arm, Gear, Generators, etc.
+    </div>
+
+    <div class="section-title">Advanced (Custom)</div>
+
+    <sdpi-item label="Device ID">
+      <input class="sdpi-item-value" type="number" id="deviceId" placeholder="e.g., 27" />
+    </sdpi-item>
+
+    <sdpi-item label="Command ID">
+      <input class="sdpi-item-value" type="number" id="commandId" placeholder="e.g., 3003" />
+    </sdpi-item>
+
+    <sdpi-item label="Press Value">
+      <input class="sdpi-item-value" type="number" id="pressValue" placeholder="1" step="0.1" />
+    </sdpi-item>
+
+    <sdpi-item label="Release Value">
+      <input class="sdpi-item-value" type="number" id="releaseValue" placeholder="0" step="0.1" />
+    </sdpi-item>
+
+    <sdpi-item label="Monitor Arg">
+      <input class="sdpi-item-value" type="number" id="monitorArgId" placeholder="Draw arg ID" />
+    </sdpi-item>
+
+    <sdpi-item label="Threshold">
+      <input class="sdpi-item-value" type="number" id="threshold" placeholder="0.5" step="0.1" min="0" max="1" />
+    </sdpi-item>
+
+  </div>
+
+  <script>
+    let websocket = null;
+    let uuid = null;
+    let actionInfo = null;
+    let currentSettings = {};
+
+    function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+      uuid = inUUID;
+      actionInfo = JSON.parse(inActionInfo);
+      currentSettings = actionInfo.payload.settings || {};
+
+      websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+
+      websocket.onopen = function() {
+        websocket.send(JSON.stringify({
+          event: inRegisterEvent,
+          uuid: inUUID,
+        }));
+        loadSettings();
+      };
+
+      websocket.onmessage = function(evt) {
+        const data = JSON.parse(evt.data);
+        if (data.event === "didReceiveSettings") {
+          currentSettings = data.payload.settings || {};
+          loadSettings();
+        }
+      };
+    }
+
+    function loadSettings() {
+      setVal("preset", currentSettings.preset || "");
+      setVal("mode", currentSettings.mode || "toggle");
+      setVal("deviceId", currentSettings.deviceId || "");
+      setVal("commandId", currentSettings.commandId || "");
+      setVal("pressValue", currentSettings.pressValue || "");
+      setVal("releaseValue", currentSettings.releaseValue || "");
+      setVal("monitorArgId", currentSettings.monitorArgId || "");
+      setVal("threshold", currentSettings.threshold || "");
+      updateModeHint();
+    }
+
+    function updateModeHint() {
+      const mode = getVal("mode");
+      const hint = document.getElementById("modeHint");
+      if (!hint) return;
+      if (mode === "momentary") {
+        hint.innerHTML =
+          '<strong>Momentary:</strong> Active only while you hold the button down. ' +
+          'Releases when you let go. ' +
+          'Use for: Engine Start, Jettison, CM Dispense, Master Caution Reset, etc.';
+      } else {
+        hint.innerHTML =
+          '<strong>Toggle:</strong> Each click flips the cockpit switch. ' +
+          'Button icon shows actual cockpit state (on/off). ' +
+          'Use for: Master Arm, Gear, Generators, etc.';
+      }
+    }
+
+    function setVal(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+
+    function getVal(id) {
+      const el = document.getElementById(id);
+      return el ? el.value : "";
+    }
+
+    function saveSettings() {
+      const settings = {};
+      const preset = getVal("preset");
+      if (preset) settings.preset = preset;
+
+      const mode = getVal("mode");
+      if (mode) settings.mode = mode;
+
+      const deviceId = getVal("deviceId");
+      if (deviceId) settings.deviceId = parseInt(deviceId);
+
+      const commandId = getVal("commandId");
+      if (commandId) settings.commandId = parseInt(commandId);
+
+      const pressValue = getVal("pressValue");
+      if (pressValue) settings.pressValue = parseFloat(pressValue);
+
+      const releaseValue = getVal("releaseValue");
+      if (releaseValue) settings.releaseValue = parseFloat(releaseValue);
+
+      const monitorArgId = getVal("monitorArgId");
+      if (monitorArgId) settings.monitorArgId = parseInt(monitorArgId);
+
+      const threshold = getVal("threshold");
+      if (threshold) settings.threshold = parseFloat(threshold);
+
+      if (websocket) {
+        websocket.send(JSON.stringify({
+          event: "setSettings",
+          context: uuid,
+          payload: settings,
+        }));
+      }
+    }
+
+    document.addEventListener("change", saveSettings);
+    document.addEventListener("input", function(e) {
+      if (e.target.tagName === "INPUT") {
+        clearTimeout(e.target._debounce);
+        e.target._debounce = setTimeout(saveSettings, 300);
+      }
+    });
+  </script>
+</body>
+</html>

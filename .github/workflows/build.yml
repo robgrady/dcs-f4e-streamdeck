@@ -1,0 +1,126 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: plugin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: plugin
+        run: npm ci
+
+      - name: Type check
+        working-directory: plugin
+        run: npx tsc --noEmit
+
+      - name: Build plugin bundle
+        working-directory: plugin
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          if (!(Test-Path "plugin/com.dcs.f4e.sdPlugin/bin/plugin.js")) {
+            Write-Error "Build output not found"
+            exit 1
+          }
+          $size = (Get-Item "plugin/com.dcs.f4e.sdPlugin/bin/plugin.js").Length
+          Write-Host "Plugin bundle size: $size bytes"
+
+      - name: Read version
+        id: version
+        run: |
+          $ver = Get-Content VERSION -Raw
+          $ver = $ver.Trim()
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+          Write-Host "Version: $ver"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: com.dcs.f4e.sdPlugin-${{ steps.version.outputs.VERSION }}
+          path: |
+            plugin/com.dcs.f4e.sdPlugin/
+            lua/
+            install.bat
+            README.md
+            VERSION
+          retention-days: 30
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: plugin/package-lock.json
+
+      - name: Install and build
+        working-directory: plugin
+        run: |
+          npm ci
+          npm run build
+
+      - name: Read version
+        id: version
+        run: |
+          $ver = Get-Content VERSION -Raw
+          $ver = $ver.Trim()
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+
+      - name: Create release zip
+        run: |
+          $ver = "${{ steps.version.outputs.VERSION }}"
+          # Create a clean release folder
+          New-Item -ItemType Directory -Path "release/dcs-f4e-streamdeck-$ver" -Force
+          Copy-Item -Recurse "plugin/com.dcs.f4e.sdPlugin" "release/dcs-f4e-streamdeck-$ver/"
+          Copy-Item -Recurse "lua" "release/dcs-f4e-streamdeck-$ver/"
+          Copy-Item "install.bat" "release/dcs-f4e-streamdeck-$ver/"
+          Copy-Item "README.md" "release/dcs-f4e-streamdeck-$ver/"
+          Copy-Item "VERSION" "release/dcs-f4e-streamdeck-$ver/"
+          # Zip it
+          Compress-Archive -Path "release/dcs-f4e-streamdeck-$ver" -DestinationPath "release/dcs-f4e-streamdeck-$ver.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "DCS F-4E Stream Deck v${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## DCS F-4E Phantom II Stream Deck Plugin v${{ steps.version.outputs.VERSION }}
+
+            ### Installation
+            1. Download `dcs-f4e-streamdeck-${{ steps.version.outputs.VERSION }}.zip`
+            2. Extract to any folder
+            3. Run `install.bat` (or follow manual install in README)
+
+            ### Requirements
+            - Windows 10+
+            - DCS World with F-4E Phantom II module
+            - DCS-ExportScripts installed
+            - Elgato Stream Deck software v6.6+
+          files: |
+            release/dcs-f4e-streamdeck-${{ steps.version.outputs.VERSION }}.zip
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>F-4E Dial/Encoder</title>
+  <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+  <style>
+    .section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #969696;
+      margin: 16px 20px 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+    .sdpi-wrapper { padding: 0; }
+  </style>
+</head>
+<body>
+  <div class="sdpi-wrapper">
+
+    <sdpi-item label="Preset">
+      <select class="sdpi-item-value" id="preset" onchange="saveSettings()">
+        <option value="">-- Custom --</option>
+
+        <optgroup label="Radio">
+          <option value="plt_uhf_freq_hundreds">UHF Freq 100s</option>
+          <option value="plt_uhf_freq_tens">UHF Freq 10s</option>
+          <option value="plt_uhf_freq_ones">UHF Freq 1s</option>
+          <option value="plt_uhf_freq_tenths">UHF Freq .1s</option>
+          <option value="plt_uhf_freq_hundredths">UHF Freq .01s</option>
+          <option value="plt_uhf_volume">UHF Volume</option>
+          <option value="plt_uhf_channel">UHF Preset Channel</option>
+          <option value="plt_uhf_aux_channel">UHF AUX Channel</option>
+          <option value="wso_uhf_volume">UHF Volume (WSO)</option>
+        </optgroup>
+
+        <optgroup label="Navigation">
+          <option value="plt_tacan_tens">TACAN Channel 10s</option>
+          <option value="plt_tacan_ones">TACAN Channel 1s</option>
+          <option value="plt_tacan_volume">TACAN Volume</option>
+          <option value="wso_tacan_tens">TACAN Ch 10s (WSO)</option>
+          <option value="wso_tacan_ones">TACAN Ch 1s (WSO)</option>
+          <option value="wso_tacan_volume">TACAN Volume (WSO)</option>
+        </optgroup>
+
+        <optgroup label="HUD">
+          <option value="plt_hud_brightness">HUD Brightness</option>
+          <option value="plt_hud_depression">HUD Reticle Depression</option>
+        </optgroup>
+
+        <optgroup label="Weapons (WRCS)">
+          <option value="plt_wrcs_drag_coeff">Drag Coefficient</option>
+          <option value="plt_wrcs_alt_range">Altitude/Range</option>
+        </optgroup>
+
+        <optgroup label="Radar (WSO)">
+          <option value="wso_radar_antenna_elev">Radar Antenna Elevation</option>
+          <option value="wso_radar_gain_fine">Radar Gain Fine</option>
+          <option value="wso_radar_gain_coarse">Radar Gain Coarse</option>
+          <option value="wso_radar_vc">Radar Vc</option>
+        </optgroup>
+
+        <optgroup label="Countermeasures">
+          <option value="plt_cm_chaff_burst_count">Chaff Burst Count</option>
+          <option value="plt_cm_chaff_salvo_count">Chaff Salvo Count</option>
+          <option value="plt_cm_flare_burst_count">Flare Burst Count</option>
+        </optgroup>
+      </select>
+    </sdpi-item>
+
+    <sdpi-item label="Display Label">
+      <input class="sdpi-item-value" type="text" id="displayLabel" placeholder="e.g., UHF Volume" />
+    </sdpi-item>
+
+    <sdpi-item label="Display Format">
+      <select class="sdpi-item-value" id="displayFormat" onchange="saveSettings()">
+        <option value="raw">Raw Value</option>
+        <option value="percent">Percentage</option>
+        <option value="frequency">Frequency</option>
+      </select>
+    </sdpi-item>
+
+    <div class="section-title">Rotation</div>
+
+    <sdpi-item label="Device ID">
+      <input class="sdpi-item-value" type="number" id="deviceId" placeholder="e.g., 3" />
+    </sdpi-item>
+
+    <sdpi-item label="Command ID">
+      <input class="sdpi-item-value" type="number" id="commandId" placeholder="e.g., 3009" />
+    </sdpi-item>
+
+    <sdpi-item label="Increment">
+      <input class="sdpi-item-value" type="number" id="incrementValue" placeholder="0.1" step="0.01" />
+    </sdpi-item>
+
+    <sdpi-item label="Decrement">
+      <input class="sdpi-item-value" type="number" id="decrementValue" placeholder="-0.1" step="0.01" />
+    </sdpi-item>
+
+    <sdpi-item label="Monitor Arg">
+      <input class="sdpi-item-value" type="number" id="monitorArgId" placeholder="Draw arg ID" />
+    </sdpi-item>
+
+    <div class="section-title">Push Action (optional)</div>
+
+    <sdpi-item label="Push Device">
+      <input class="sdpi-item-value" type="number" id="pushDeviceId" placeholder="Same as rotation" />
+    </sdpi-item>
+
+    <sdpi-item label="Push Command">
+      <input class="sdpi-item-value" type="number" id="pushCommandId" placeholder="Command ID" />
+    </sdpi-item>
+
+    <sdpi-item label="Push Value">
+      <input class="sdpi-item-value" type="number" id="pushValue" placeholder="1" step="0.1" />
+    </sdpi-item>
+
+  </div>
+
+  <script>
+    let websocket = null;
+    let uuid = null;
+    let currentSettings = {};
+
+    function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+      uuid = inUUID;
+      const actionInfo = JSON.parse(inActionInfo);
+      currentSettings = actionInfo.payload.settings || {};
+
+      websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+      websocket.onopen = function() {
+        websocket.send(JSON.stringify({ event: inRegisterEvent, uuid: inUUID }));
+        loadSettings();
+      };
+      websocket.onmessage = function(evt) {
+        const data = JSON.parse(evt.data);
+        if (data.event === "didReceiveSettings") {
+          currentSettings = data.payload.settings || {};
+          loadSettings();
+        }
+      };
+    }
+
+    function loadSettings() {
+      const fields = [
+        "preset", "displayLabel", "displayFormat",
+        "deviceId", "commandId", "incrementValue", "decrementValue", "monitorArgId",
+        "pushDeviceId", "pushCommandId", "pushValue",
+      ];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && currentSettings[id] !== undefined) el.value = currentSettings[id];
+      });
+    }
+
+    function saveSettings() {
+      const settings = {};
+      const fields = {
+        preset: "string", displayLabel: "string", displayFormat: "string",
+        deviceId: "int", commandId: "int",
+        incrementValue: "float", decrementValue: "float", monitorArgId: "int",
+        pushDeviceId: "int", pushCommandId: "int", pushValue: "float",
+      };
+      for (const [key, type] of Object.entries(fields)) {
+        const val = document.getElementById(key)?.value;
+        if (val === "" || val === undefined) continue;
+        if (type === "int") settings[key] = parseInt(val);
+        else if (type === "float") settings[key] = parseFloat(val);
+        else settings[key] = val;
+      }
+      if (websocket) {
+        websocket.send(JSON.stringify({ event: "setSettings", context: uuid, payload: settings }));
+      }
+    }
+
+    document.addEventListener("change", saveSettings);
+    document.addEventListener("input", function(e) {
+      if (e.target.tagName === "INPUT") {
+        clearTimeout(e.target._debounce);
+        e.target._debounce = setTimeout(saveSettings, 300);
+      }
+    });
+  </script>
+</body>
+</html>

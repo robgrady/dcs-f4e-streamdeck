@@ -1,0 +1,142 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "com.dcs.f4e",
+  "Name": "DCS F-4E Phantom II",
+  "Version": "0.1.0.0",
+  "Description": "Control the DCS World F-4E Phantom II cockpit from your Stream Deck +. Supports buttons, switches, and rotary encoders with real-time cockpit state feedback.",
+  "Author": "DCS F-4E Stream Deck Project",
+  "Category": "DCS World",
+  "CategoryIcon": "assets/plugin-icon",
+  "Icon": "assets/plugin-icon",
+  "CodePath": "bin/plugin.js",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.6"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Nodejs": {
+    "Version": "20",
+    "Debug": "enabled"
+  },
+  "ApplicationsToMonitor": {
+    "windows": ["DCS.exe"]
+  },
+  "Actions": [
+    {
+      "UUID": "com.dcs.f4e.button",
+      "Name": "F-4E Button",
+      "Icon": "assets/actions/button",
+      "Tooltip": "Momentary pushbutton or toggle switch. Sends a command on press and optionally on release. Can display cockpit state.",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "assets/actions/button-off",
+          "Name": "Off",
+          "TitleAlignment": "bottom"
+        },
+        {
+          "Image": "assets/actions/button-on",
+          "Name": "On",
+          "TitleAlignment": "bottom"
+        }
+      ],
+      "PropertyInspectorPath": "ui/button-pi.html",
+      "SupportedInMultiActions": true
+    },
+    {
+      "UUID": "com.dcs.f4e.switch",
+      "Name": "F-4E Multi-Position",
+      "Icon": "assets/actions/switch",
+      "Tooltip": "Cycle through multiple switch positions. Each press advances to the next position. Displays current position.",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "assets/actions/switch-off",
+          "Name": "Position",
+          "TitleAlignment": "bottom"
+        }
+      ],
+      "PropertyInspectorPath": "ui/switch-pi.html",
+      "SupportedInMultiActions": true
+    },
+    {
+      "UUID": "com.dcs.f4e.encoder",
+      "Name": "F-4E Dial",
+      "Icon": "assets/actions/encoder",
+      "Tooltip": "Rotary control with touch strip feedback. Use the dial to turn knobs and the touch strip to see current value.",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$A1",
+        "TriggerDescription": {
+          "Push": "Press",
+          "Rotate": "Adjust",
+          "Touch": "Tap",
+          "LongTouch": "Reset"
+        }
+      },
+      "PropertyInspectorPath": "ui/encoder-pi.html"
+    },
+    {
+      "UUID": "com.dcs.f4e.radio",
+      "Name": "F-4E Radio Freq",
+      "Icon": "assets/actions/radio",
+      "Tooltip": "Tune UHF radio frequency with the dial. Displays current frequency on the touch strip.",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "layouts/radio-freq-layout.json",
+        "TriggerDescription": {
+          "Push": "Toggle",
+          "Rotate": "Tune",
+          "Touch": "Channel",
+          "LongTouch": "Squelch"
+        }
+      },
+      "PropertyInspectorPath": "ui/encoder-pi.html"
+    },
+    {
+      "UUID": "com.dcs.f4e.status",
+      "Name": "F-4E Connection",
+      "Icon": "assets/actions/status",
+      "Tooltip": "Shows DCS connection status. Green when connected and receiving data, red when disconnected.",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "assets/actions/status-off",
+          "Name": "Disconnected",
+          "TitleAlignment": "middle"
+        },
+        {
+          "Image": "assets/actions/status-on",
+          "Name": "Connected",
+          "TitleAlignment": "middle"
+        }
+      ],
+      "DisableAutomaticStates": true
+    }
+  ],
+  "Profiles": [
+    {
+      "Name": "F-4E Default",
+      "DeviceType": 7,
+      "Readonly": false,
+      "DontAutoSwitchWhenInstalled": false
+    },
+    {
+      "Name": "F-4E Weapons",
+      "DeviceType": 7,
+      "Readonly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
+      "Name": "F-4E Startup",
+      "DeviceType": 7,
+      "Readonly": false,
+      "DontAutoSwitchWhenInstalled": true
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>F-4E Multi-Position Switch</title>
+  <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+  <style>
+    .section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #969696;
+      margin: 16px 20px 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+    .sdpi-wrapper { padding: 0; }
+  </style>
+</head>
+<body>
+  <div class="sdpi-wrapper">
+
+    <sdpi-item label="Preset">
+      <select class="sdpi-item-value" id="preset" onchange="saveSettings()">
+        <option value="">-- Custom --</option>
+
+        <optgroup label="Weapons">
+          <option value="plt_delivery_mode">Delivery Mode (13 pos)</option>
+          <option value="plt_weapon_select">Weapon Select (8 pos)</option>
+          <option value="plt_fuze_arm">Fuze Arm (5 pos)</option>
+          <option value="plt_jettison_select">Jettison Select (9 pos)</option>
+          <option value="plt_bomb_quantity">Bomb Quantity (12 pos)</option>
+          <option value="plt_bomb_interval">Bomb Interval (12 pos)</option>
+          <option value="plt_bomb_interval_mult">Bomb Interval Mult (4 pos)</option>
+          <option value="plt_radar_missile_cw">Radar Missile CW (3 pos)</option>
+          <option value="plt_missile_reject">Missile Reject (3 pos)</option>
+        </optgroup>
+
+        <optgroup label="Weapons (WRCS)">
+          <option value="plt_wrcs_release_advance">Release Advance (3 pos)</option>
+          <option value="plt_wrcs_bomb_mode">Bomb Mode (3 pos)</option>
+        </optgroup>
+
+        <optgroup label="Flight">
+          <option value="plt_flaps_slats">Flaps/Slats (3 pos)</option>
+        </optgroup>
+
+        <optgroup label="Electrical">
+          <option value="plt_generator_l">Generator L (3 pos)</option>
+          <option value="plt_generator_r">Generator R (3 pos)</option>
+        </optgroup>
+
+        <optgroup label="Countermeasures">
+          <option value="plt_cm_chaff_burst_count">Chaff Burst Count (6 pos)</option>
+          <option value="plt_cm_chaff_burst_interval">Chaff Burst Interval (4 pos)</option>
+          <option value="plt_cm_chaff_salvo_count">Chaff Salvo Count (5 pos)</option>
+          <option value="plt_cm_chaff_salvo_interval">Chaff Salvo Interval (4 pos)</option>
+          <option value="plt_cm_flare_burst_count">Flare Burst Count (5 pos)</option>
+          <option value="plt_cm_flare_burst_interval">Flare Burst Interval (5 pos)</option>
+          <option value="wso_cm_chaff_mode">Chaff Mode - WSO (4 pos)</option>
+          <option value="wso_cm_flare_mode">Flare Mode - WSO (3 pos)</option>
+        </optgroup>
+
+        <optgroup label="Radio">
+          <option value="plt_uhf_mode">UHF Mode (6 pos)</option>
+          <option value="plt_uhf_freq_mode">UHF Freq Mode (3 pos)</option>
+          <option value="plt_uhf_channel">UHF Preset Channel (18 pos)</option>
+          <option value="plt_uhf_aux_channel">UHF AUX Channel (20 pos)</option>
+          <option value="plt_uhf_antenna">UHF Antenna (3 pos)</option>
+          <option value="wso_uhf_mode">UHF Mode - WSO (6 pos)</option>
+          <option value="wso_uhf_freq_mode">UHF Freq Mode - WSO (3 pos)</option>
+          <option value="wso_uhf_channel">UHF Preset Channel - WSO (18 pos)</option>
+        </optgroup>
+
+        <optgroup label="Navigation">
+          <option value="plt_tacan_mode">TACAN Mode (5 pos)</option>
+          <option value="plt_tacan_tens">TACAN Channel 10s</option>
+          <option value="plt_tacan_ones">TACAN Channel 1s</option>
+          <option value="plt_nav_mode">Nav Mode (4 pos)</option>
+          <option value="wso_ins_power">INS Power - WSO (4 pos)</option>
+          <option value="wso_ins_align">INS Align Mode - WSO (3 pos)</option>
+          <option value="wso_nav_mode">Nav Computer - WSO (5 pos)</option>
+          <option value="wso_nav_position_update">Position Update - WSO (3 pos)</option>
+          <option value="wso_tacan_mode">TACAN Mode - WSO (5 pos)</option>
+          <option value="wso_tacan_tens">TACAN Ch 10s - WSO</option>
+          <option value="wso_tacan_ones">TACAN Ch 1s - WSO</option>
+        </optgroup>
+
+        <optgroup label="HUD">
+          <option value="plt_hud_mode">HUD Mode (7 pos)</option>
+        </optgroup>
+
+        <optgroup label="Fuel">
+          <option value="plt_fuel_external_tanks">External Tanks Feed (3 pos)</option>
+          <option value="plt_fuel_refuel_selector">Refuel Selector (4 pos)</option>
+        </optgroup>
+
+        <optgroup label="Radar (WSO)">
+          <option value="wso_radar_power">Radar Power (5 pos)</option>
+          <option value="wso_radar_range">Radar Range (6 pos)</option>
+          <option value="wso_radar_mode">Radar Mode (6 pos)</option>
+          <option value="wso_radar_display">Radar Display (5 pos)</option>
+          <option value="wso_radar_pulse">Radar Pulse (3 pos)</option>
+          <option value="wso_radar_track">Radar Track (3 pos)</option>
+          <option value="wso_radar_polarization">Radar Polarization (3 pos)</option>
+          <option value="wso_radar_vc">Radar Vc (7 pos)</option>
+        </optgroup>
+      </select>
+    </sdpi-item>
+
+    <div class="section-title">Advanced (Custom)</div>
+
+    <sdpi-item label="Device ID">
+      <input class="sdpi-item-value" type="number" id="deviceId" placeholder="e.g., 27" />
+    </sdpi-item>
+
+    <sdpi-item label="Command ID">
+      <input class="sdpi-item-value" type="number" id="commandId" placeholder="e.g., 3010" />
+    </sdpi-item>
+
+    <sdpi-item label="Increment">
+      <input class="sdpi-item-value" type="number" id="incrementValue" placeholder="0.1" step="0.01" />
+    </sdpi-item>
+
+    <sdpi-item label="Decrement">
+      <input class="sdpi-item-value" type="number" id="decrementValue" placeholder="-0.1" step="0.01" />
+    </sdpi-item>
+
+    <sdpi-item label="Monitor Arg">
+      <input class="sdpi-item-value" type="number" id="monitorArgId" placeholder="Draw arg ID" />
+    </sdpi-item>
+
+    <sdpi-item label="Positions">
+      <input class="sdpi-item-value" type="number" id="positions" placeholder="e.g., 5" min="2" max="20" />
+    </sdpi-item>
+
+  </div>
+
+  <script>
+    let websocket = null;
+    let uuid = null;
+    let currentSettings = {};
+
+    function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+      uuid = inUUID;
+      const actionInfo = JSON.parse(inActionInfo);
+      currentSettings = actionInfo.payload.settings || {};
+
+      websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+      websocket.onopen = function() {
+        websocket.send(JSON.stringify({ event: inRegisterEvent, uuid: inUUID }));
+        loadSettings();
+      };
+      websocket.onmessage = function(evt) {
+        const data = JSON.parse(evt.data);
+        if (data.event === "didReceiveSettings") {
+          currentSettings = data.payload.settings || {};
+          loadSettings();
+        }
+      };
+    }
+
+    function loadSettings() {
+      const ids = ["preset", "deviceId", "commandId", "incrementValue", "decrementValue", "monitorArgId", "positions"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && currentSettings[id] !== undefined) el.value = currentSettings[id];
+      });
+    }
+
+    function saveSettings() {
+      const settings = {};
+      const fields = {
+        preset: "string",
+        deviceId: "int",
+        commandId: "int",
+        incrementValue: "float",
+        decrementValue: "float",
+        monitorArgId: "int",
+        positions: "int",
+      };
+      for (const [key, type] of Object.entries(fields)) {
+        const val = document.getElementById(key)?.value;
+        if (val === "" || val === undefined) continue;
+        if (type === "int") settings[key] = parseInt(val);
+        else if (type === "float") settings[key] = parseFloat(val);
+        else settings[key] = val;
+      }
+      if (websocket) {
+        websocket.send(JSON.stringify({ event: "setSettings", context: uuid, payload: settings }));
+      }
+    }
+
+    document.addEventListener("change", saveSettings);
+    document.addEventListener("input", function(e) {
+      if (e.target.tagName === "INPUT") {
+        clearTimeout(e.target._debounce);
+        e.target._debounce = setTimeout(saveSettings, 300);
+      }
+    });
+  </script>
+</body>
+</html>
